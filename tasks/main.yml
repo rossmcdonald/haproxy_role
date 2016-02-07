@@ -1,0 +1,54 @@
+---
+
+- name: Add haproxy repo
+  apt_repository:
+    repo: ppa:vbernat/haproxy-1.6
+
+- name: Install haproxy
+  apt:
+    name: haproxy
+    state: present
+
+- name: Create haproxy directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  with_items:
+    - "{{ haproxy_global_chroot_dir }}"
+    - "{{ haproxy_configuration_directory }}"
+
+- name: Create haproxy group
+  group:
+    name: "{{ haproxy_global_run_group }}"
+    state: present
+
+- name: Create haproxy user
+  user:
+    name: "{{ haproxy_global_run_user }}"
+    groups: "{{ haproxy_global_run_group }}"
+    home: "{{ haproxy_global_chroot_dir }}"
+    state: present
+    createhome: yes
+
+- name: Template haproxy configuration
+  template:
+    src: etc/haproxy/haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+  notify:
+    - reload haproxy
+
+- name: Template haproxy defaults
+  template:
+    src: etc/default/haproxy.j2
+    dest: /etc/default/haproxy
+  notify:
+    - reload haproxy
+
+- name: Start haproxy
+  service:
+    name: haproxy
+    state: started
+    enabled: yes

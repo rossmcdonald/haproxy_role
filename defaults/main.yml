@@ -1,0 +1,34 @@
+---
+
+haproxy_configuration_directory: /etc/haproxy
+
+haproxy_daemonize: yes
+
+haproxy_global_maxconn: 4096
+haproxy_global_run_user: haproxy
+haproxy_global_run_group: haproxy
+haproxy_global_chroot_dir: /var/lib/haproxy
+
+haproxy_defaults_log: global
+haproxy_defaults_mode: tcp
+
+haproxy_defaults_options:
+  - dontlognull
+  - redispatch
+
+haproxy_defaults_retries: 3
+haproxy_defaults_maxconn: 2000
+
+haproxy_frontends:
+  - name: cassandra-in
+    bind_address: "*"
+    bind_port: 6943
+    default_backend: cassandra-out
+
+haproxy_backends:
+  - name: cassandra-out
+    servers:
+      - name: cassandra1
+        ip: localhost
+        port: 9042
+
