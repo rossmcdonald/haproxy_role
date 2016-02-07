@@ -33,7 +33,8 @@ frontend {{ frontend.name }}
 
 {% for backend in haproxy_backends %}
 backend {{ backend.name }}
+	balance {{ backend.balance }}
 {% for server in backend.servers %}
-        server {{ server.name }} {{ server.ip }}:{{ server.port }}
+        server {{ server.name }} {{ server.ip }}:{{ server.port }} check
 {% endfor %}
 {% endfor %}
