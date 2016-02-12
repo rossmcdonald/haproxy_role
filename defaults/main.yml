@@ -14,7 +14,21 @@ haproxy_defaults_mode: tcp
 
 haproxy_defaults_options:
   - dontlognull
-  - redispatch
+  - tcplog
+
+# To enable rsyslog support, you will need to enable rsyslog's local
+# UDP listener by uncommenting/adding the following lines to the
+# '/etc/rsyslog.conf' file:
+#
+# $ModLoad imudp
+# $UDPServerRun 514
+# $UDPServerAddress 127.0.0.1
+#
+haproxy_log_outputs: - 127.0.0.1 local1 debug
+
+haproxy_local_log_path: /var/log/haproxy.log
+
+# investigate option: ssl-hello-chk
 
 haproxy_defaults_retries: 3
 haproxy_defaults_maxconn: 2000
@@ -24,6 +38,9 @@ haproxy_frontends:
     bind_address: "*"
     bind_port: 6943
     default_backend: cassandra-out
+    mode: tcp
+    options:
+      - tcplog
 
 haproxy_backends:
   - name: cassandra-out
@@ -32,4 +49,7 @@ haproxy_backends:
         ip: localhost
         port: 9042
     balance: leastconn
+    mode: tcp
+    options:
+      - tcplog
 

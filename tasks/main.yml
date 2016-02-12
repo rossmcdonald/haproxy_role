@@ -47,6 +47,11 @@
   notify:
     - reload haproxy
 
+- name: Template haproxy rsyslog configuration
+  template:
+    src: etc/rsyslog.d/haproxy.cfg.j2
+    dest: /etc/rsyslog.d/haproxy.cfg
+
 - name: Start haproxy
   service:
     name: haproxy

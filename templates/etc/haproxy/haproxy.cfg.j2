@@ -3,6 +3,9 @@ global
 	chroot {{ haproxy_global_chroot_dir }}
 	user {{ haproxy_global_run_user }}
 	group {{ haproxy_global_run_group }}
+{% for log in haproxy_log_outputs %}
+	log {{ log }}
+{% endfor %}
 	{% if haproxy_daemonize %}daemon{% endif %}
 
 defaults
@@ -28,7 +31,9 @@ defaults
 frontend {{ frontend.name }}
 	bind {{ frontend.bind_address }}:{{ frontend.bind_port }}
 	default_backend {{ frontend.default_backend }}
-
+{% for option in frontend.options %}
+        option {{ option }}
+{% endfor %}
 {% endfor %}
 
 {% for backend in haproxy_backends %}
@@ -37,4 +42,9 @@ backend {{ backend.name }}
 {% for server in backend.servers %}
         server {{ server.name }} {{ server.ip }}:{{ server.port }} check
 {% endfor %}
+{% for option in backend.options %}
+        option {{ option }}
 {% endfor %}
+
+{% endfor %}
+
